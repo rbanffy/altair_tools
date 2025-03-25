@@ -174,6 +174,28 @@ struct disk_type MITS8IN_FORMAT = {
 	}
 };
 
+/* SimH 254-track 8" floppy drive */
+struct disk_type MITS8IN_254T_FORMAT = {
+	.type = "FDD_8IN_254T",
+	.sector_len = 137,
+	.sector_data_len = 128,
+	.num_tracks = 254,
+	.reserved_tracks = 2,
+	.sectors_per_track = 32,
+	.block_size = 2048,
+	.num_directories = 64,
+	.directory_allocs = 2,
+	.image_size = 1113536,
+	.skew_table_size = sizeof(mits_skew_table),
+	.skew_table = mits_skew_table,
+	.skew_function = &mits8in_skew_function,
+	.format_function = &mits8in_format_disk,
+	.offsets = {
+		{ 0,  5, 3, 0, 0, 131, 133, 132, 0 },
+		{ 6, 77, 7, 0, 1, 135, 136, 4, 1 }
+	}
+};
+
 /* The FDC+ controller supports an 8MB "floppy" disk */
 struct disk_type MITS8IN8MB_FORMAT = {
 	.type = "FDD_8IN_8MB",
@@ -861,6 +883,7 @@ void print_usage(char* argv0)
 	printf("\t-s\tWrite saved CP/M system image to disk image (make disk bootable)\n");
 	printf("\t-T\tDisk image type. Auto-detected if possible. Supported types are:\n");
 	printf("\t\t\t* %s - MITS 8\" Floppy Disk (Default)\n", MITS8IN_FORMAT.type);
+	printf("\t\t\t* %s - MITS 8\" Floppy Disk with 254 tracks\n", MITS8IN_254T_FORMAT.type);
 	printf("\t\t\t* %s - MITS 5MB Hard Disk\n", MITS5MBHDD_FORMAT.type);
 	printf("\t\t\t* %s - MITS 5MB, with 1024 directories (!!!)\n", MITS5MBHDD1024_FORMAT.type);
 	printf("\t\t\t* %s - Tarbell Floppy Disk\n", TARBELLFDD_FORMAT.type);
@@ -2279,6 +2302,10 @@ void disk_set_type(int fd, const char* type)
 	if (!strcasecmp(type, MITS8IN_FORMAT.type))
 	{
 		disk_type = &MITS8IN_FORMAT;
+	}
+	if (!strcasecmp(type, MITS8IN_254T_FORMAT.type))
+	{
+		disk_type = &MITS8IN_254T_FORMAT;
 	}
 	else if (!strcasecmp(type, MITS5MBHDD_FORMAT.type))
 	{
